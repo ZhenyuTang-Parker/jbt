@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNavigator AI - Application Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #005A9C;
+            --primary-color-light: #E6F0F6;
+            --secondary-color: #F8B400; /* Gold for 'Offer' column */
+            --bg-color: #F4F7FC;
+            --text-color: #333;
+            --text-light-color: #777;
+            --border-color: #E0E0E0;
+            --card-bg-color: #FFFFFF;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            overflow: hidden; /* Prevent body scroll, allow Kanban scroll */
+        }
+
+        /* --- 左侧导航栏 (Links finalized) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .sidebar .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style-type: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-light-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a i {
+            width: 30px;
+            font-size: 1.2em;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .sidebar .profile-card {
+            padding: 20px;
+            margin: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .profile-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* --- 主内容区 --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 30px 30px 20px 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        /* --- Kanban 看板布局 --- */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            padding: 0 30px 30px 30px;
+            overflow-x: auto;
+            flex-grow: 1;
+            height: 100%;
+        }
+        
+        /* 美化滚动条 */
+        .kanban-board::-webkit-scrollbar {
+            height: 12px;
+        }
+        .kanban-board::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .kanban-board::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 6px;
+        }
+        .kanban-board::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        .kanban-column {
+            width: 300px;
+            flex-shrink: 0;
+            background-color: #EBECF0; /* Trello-like column color */
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .column-header {
+            padding: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-count {
+            background-color: #dcdde1;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.9em;
+        }
+        
+        .column-cards {
+            padding: 0 10px 10px 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        /* 卡片样式 */
+        .kanban-card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: grab;
+            border-left: 5px solid transparent;
+            transition: box-shadow 0.2s;
+        }
+        
+        .kanban-card:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .kanban-card.offer-card {
+            border-left-color: var(--secondary-color);
+        }
+        
+        .kanban-card h4 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .kanban-card p {
+            color: var(--text-light-color);
+            font-size: 0.9em;
+        }
+        
+        /* 拖拽效果 */
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+        }
+        
+        .column-cards.drag-over {
+            background-color: #d4e3ee; /* Highlight drop area */
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-compass"></i>
+            <span>CareerNavigator</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="mindmap.html"><i class="fa-solid fa-map-signs"></i><span>Strategy Map</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="job-search.html"><i class="fa-solid fa-briefcase"></i><span>Job Search</span></a>
+            </li>
+            <li class="nav-item active">
+                <a href="tracker.html"><i class="fa-solid fa-tasks"></i><span>Application Tracker</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="document-studio.html"><i class="fa-solid fa-file-alt"></i><span>Document Studio</span></a>
+            </li>
+        </ul>
+        <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User Avatar">
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Job Application Tracker</h1>
+            <p style="color: var(--text-light-color);">Drag and drop cards to update your application status.</p>
+        </header>
+
+        <div class="kanban-board">
+            <div class="kanban-column" data-column-id="saved">
+                <div class="column-header">
+                    <span>Saved</span>
+                    <span class="card-count">2</span>
+                </div>
+                <div class="column-cards">
+                    <div class="kanban-card" draggable="true" id="card-1">
+                        <h4>Data Scientist</h4>
+                        <p>Spotify</p>
+                    </div>
+                    <div class="kanban-card" draggable="true" id="card-2">
+                        <h4>Product Manager Intern</h4>
+                        <p>TikTok</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kanban-column" data-column-id="applied">
+                <div class="column-header">
+                    <span>Applied</span>
+                    <span class="card-count">3</span>
+                </div>
+                <div class="column-cards">
+                    <div class="kanban-card" draggable="true" id="card-3">
+                        <h4>Software Engineer</h4>
+                        <p>Google</p>
+                    </div>
+                     <div class="kanban-card" draggable="true" id="card-4">
+                        <h4>Cloud Solutions Architect</h4>
+                        <p>Microsoft</p>
+                    </div>
+                     <div class="kanban-card" draggable="true" id="card-5">
+                        <h4>Frontend Intern</h4>
+                        <p>Local Web Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kanban-column" data-column-id="interviewing">
+                <div class="column-header">
+                    <span>Interviewing</span>
+                    <span class="card-count">1</span>
+                </div>
+                 <div class="column-cards">
+                     <div class="kanban-card" draggable="true" id="card-6">
+                        <h4>Quantitative Researcher</h4>
+                        <p>Jane Street</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kanban-column" data-column-id="offer">
+                <div class="column-header">
+                    <span>Offer</span>
+                    <span class="card-count">1</span>
+                </div>
+                 <div class="column-cards">
+                     <div class="kanban-card offer-card" draggable="true" id="card-7">
+                        <h4>Technology Consulting Intern</h4>
+                        <p>Deloitte</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kanban-column" data-column-id="archived">
+                <div class="column-header">
+                    <span>Archived</span>
+                    <span class="card-count">1</span>
+                </div>
+                <div class="column-cards">
+                    <div class="kanban-card" draggable="true" id="card-8" style="opacity: 0.7;">
+                        <h4>Research Assistant</h4>
+                        <p>University of Southampton</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.kanban-card');
+    const columns = document.querySelectorAll('.column-cards');
+
+    // Function to update card counts
+    const updateCardCounts = () => {
+        const allColumns = document.querySelectorAll('.kanban-column');
+        allColumns.forEach(column => {
+            const count = column.querySelectorAll('.kanban-card').length;
+            column.querySelector('.card-count').textContent = count;
+        });
+    };
+
+    // --- Drag and Drop Logic ---
+
+    // For each card, add a dragstart and dragend listener
+    cards.forEach(card => {
+        card.addEventListener('dragstart', () => {
+            card.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            updateCardCounts(); // Update counts after drop is complete
+        });
+    });
+
+    // For each column, add dragover and drop listeners
+    columns.forEach(column => {
+        column.addEventListener('dragover', e => {
+            e.preventDefault(); // Necessary to allow dropping
+            column.classList.add('drag-over');
+        });
+
+        column.addEventListener('dragleave', () => {
+            column.classList.remove('drag-over');
+        });
+
+        column.addEventListener('drop', e => {
+            e.preventDefault();
+            column.classList.remove('drag-over');
+            const draggingCard = document.querySelector('.dragging');
+            if (draggingCard) {
+                column.appendChild(draggingCard);
+            }
+        });
+    });
+    
+    // Initial count update on page load
+    updateCardCounts();
+});
+</script>
+
+</body>
+</html>

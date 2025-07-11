@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNavigator AI - Document Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #005A9C;
+            --primary-color-light: #E6F0F6;
+            --secondary-color: #F8B400;
+            --bg-color: #F4F7FC;
+            --text-color: #333;
+            --text-light-color: #777;
+            --border-color: #E0E0E0;
+            --card-bg-color: #FFFFFF;
+            --sidebar-width: 240px;
+            --success-color: #28a745;
+            --success-light-color: #eaf6ec;
+            --danger-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+        }
+
+        /* --- 左侧导航栏 (Links updated) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .sidebar .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style-type: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-light-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a i {
+            width: 30px;
+            font-size: 1.2em;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .sidebar .profile-card {
+            padding: 20px;
+            margin: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .profile-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* --- 主内容区 --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 30px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        /* --- 文书工作室布局 --- */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-panel textarea {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+        }
+        
+        .input-panel label {
+            font-weight: 500;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .action-bar {
+            text-align: center;
+        }
+        
+        .btn-analyze {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-analyze:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .btn-analyze:disabled {
+            background-color: var(--text-light-color);
+            cursor: not-allowed;
+        }
+        .btn-analyze i {
+            margin-right: 10px;
+        }
+        
+        /* --- 结果展示区 --- */
+        .results-container {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: none; /* Initially hidden */
+        }
+        
+        .results-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        
+        .score-card {
+            text-align: center;
+            background-color: var(--primary-color-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .score-card h3 {
+            color: var(--text-light-color);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .score-value {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+        
+        .suggestions-list h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .suggestion-item {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .suggestion-item strong {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        /* 'Diff' a'la GitHub style */
+        .suggestion-item p {
+            font-family: monospace;
+            line-height: 1.6;
+            background-color: #f6f8fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .suggestion-remove {
+            color: var(--danger-color);
+            text-decoration: line-through;
+        }
+        
+        .suggestion-add {
+            color: var(--success-color);
+            background-color: var(--success-light-color);
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-compass"></i>
+            <span>CareerNavigator</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="mindmap.html"><i class="fa-solid fa-map-signs"></i><span>Strategy Map</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="job-search.html"><i class="fa-solid fa-briefcase"></i><span>Job Search</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tracker.html"><i class="fa-solid fa-tasks"></i><span>Application Tracker</span></a>
+            </li>
+            <li class="nav-item active">
+                <a href="document-studio.html"><i class="fa-solid fa-file-alt"></i><span>Document Studio</span></a>
+            </li>
+        </ul>
+        <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User Avatar">
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>AI Document Customization Studio</h1>
+            <p style="color: var(--text-light-color);">Optimize your application documents with one click based on your target job description.</p>
+        </header>
+
+        <div class="studio-container">
+            <div class="input-panel">
+                <label for="job-description">1. Paste Job Description</label>
+                <textarea id="job-description" placeholder="Paste the full job description here..."></textarea>
+            </div>
+            <div class="input-panel">
+                <label for="cv-content">2. Paste Your Resume Content</label>
+                <textarea id="cv-content" placeholder="Paste your resume content here..."></textarea>
+            </div>
+        </div>
+        
+        <div class="action-bar">
+            <button class="btn-analyze" id="analyzeBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span id="btn-text">Analyze and Optimize My Resume</span>
+            </button>
+        </div>
+        
+        <div class="results-container" id="resultsContainer">
+            <h2><i class="fa-solid fa-lightbulb"></i> AI Analysis & Suggestions</h2>
+            
+            <div class="score-card">
+                <h3>Keyword Match</h3>
+                <div class="score-value">85%</div>
+            </div>
+            
+            <div class="suggestions-list">
+                <h3>Specific Suggestions:</h3>
+                
+                <div class="suggestion-item">
+                    <strong>Suggestion 1: Highlight Project Impact (STAR Principle)</strong>
+                    <p>
+                        <span class="suggestion-remove">- Responsible for developing an e-commerce website.</span><br>
+                        <span class="suggestion-add">+ Led the development of a full-stack e-commerce platform based on React, optimized API calls to improve page load speed by 30%, resulting in a 15% increase in sales.</span>
+                    </p>
+                </div>
+                
+                <div class="suggestion-item">
+                    <strong>Suggestion 2: Match JD Keywords 'Cloud' and 'CI/CD'</strong>
+                    <p>
+                        <span class="suggestion-remove">- Used various technologies to complete the project.</span><br>
+                        <span class="suggestion-add">+ Proficient in deploying projects using AWS S3 and EC2, and set up a Jenkins-based CI/CD pipeline for automated testing and deployment.</span>
+                    </p>
+                </div>
+
+                <div class="suggestion-item">
+                    <strong>Suggestion 3: Quantify Skill Proficiency</strong>
+                     <p>
+                        <span class="suggestion-remove">- Proficient in Python and JavaScript.</span><br>
+                        <span class="suggestion-add">+ 3+ years of Python (Flask, Pandas) development experience and 2+ years of JavaScript (React, Node.js) project experience.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const btnText = document.getElementById('btn-text');
+    const resultsContainer = document.getElementById('resultsContainer');
+
+    analyzeBtn.addEventListener('click', function() {
+        // Disable button and show loading state
+        analyzeBtn.disabled = true;
+        btnText.textContent = 'Analyzing...';
+        analyzeBtn.querySelector('i').classList.add('fa-spin');
+        
+        // Hide existing results (if clicked again)
+        resultsContainer.style.display = 'none';
+
+        // Simulate AI analysis delay (2 seconds)
+        setTimeout(() => {
+            // Restore button state
+            analyzeBtn.disabled = false;
+            btnText.textContent = 'Analyze and Optimize My Resume';
+            analyzeBtn.querySelector('i').classList.remove('fa-spin');
+            
+            // Show results area
+            resultsContainer.style.display = 'block';
+            
+            // Scroll to results area for user
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            
+        }, 2000);
+    });
+});
+</script>
+
+</body>
+</html>

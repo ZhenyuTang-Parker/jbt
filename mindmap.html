@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNavigator AI - Strategy Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #005A9C; /* 大学品牌主色调 */
+            --primary-color-light: #E6F0F6;
+            --secondary-color: #F8B400;
+            --bg-color: #F4F7FC;
+            --text-color: #333;
+            --text-light-color: #777;
+            --border-color: #E0E0E0;
+            --card-bg-color: #FFFFFF;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            overflow-x: hidden; /* 防止导图溢出时出现水平滚动条 */
+        }
+
+        /* --- 左侧导航栏 (与 dashboard.html 相同) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .sidebar .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style-type: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-light-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a i {
+            width: 30px;
+            font-size: 1.2em;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .sidebar .profile-card {
+            padding: 20px;
+            margin: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .profile-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* --- 主内容区 --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 30px;
+            position: relative; /* 为详情侧边栏定位 */
+            transition: width 0.4s ease; /* 侧边栏滑出时主内容区宽度变化 */
+        }
+        
+        .main-content.sidebar-open {
+            width: calc(100% - var(--sidebar-width) - 350px);
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        /* --- 思维导图容器 --- */
+        .mindmap-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+            min-height: 70vh;
+        }
+        
+        /* --- 思维导图核心样式 --- */
+        .mindmap {
+            display: flex;
+            align-items: center;
+        }
+        .mindmap ul {
+            list-style: none;
+            padding-left: 100px;
+            position: relative;
+        }
+        .mindmap .central-topic {
+            padding-left: 0;
+        }
+        .mindmap li {
+            position: relative;
+            padding: 15px 0 15px 50px;
+        }
+
+        /* 连接线样式 */
+        .mindmap li::before { /* 水平连接线 */
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--border-color);
+        }
+        .mindmap li::after { /* 垂直连接线 */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background-color: var(--border-color);
+        }
+        /* 根节点和叶子节点的连接线处理 */
+        .mindmap .central-topic > li::before,
+        .mindmap .central-topic > li::after {
+            display: none;
+        }
+        .mindmap li:first-child::after {
+            height: 50%;
+            top: 50%;
+        }
+        .mindmap li:last-child::after {
+            height: 50%;
+        }
+        .mindmap li:only-child::after {
+            display: none;
+        }
+        
+        /* 节点样式 */
+        .node {
+            background-color: var(--card-bg-color);
+            border: 2px solid var(--border-color);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .node:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .node.central {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-size: 1.2em;
+            transform: scale(1.1);
+        }
+        .node.selected {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(248, 180, 0, 0.5);
+        }
+        .node i {
+            margin-right: 10px;
+        }
+        
+        /* --- 详情侧边栏 --- */
+        .details-sidebar {
+            position: fixed;
+            top: 0;
+            right: -350px; /* 初始状态在屏幕外 */
+            width: 350px;
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            transition: right 0.4s ease;
+            overflow-y: auto;
+        }
+        .details-sidebar.open {
+            right: 0;
+        }
+        
+        .details-sidebar .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5em;
+            color: var(--text-light-color);
+            cursor: pointer;
+        }
+        
+        .details-sidebar h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .details-sidebar p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .details-sidebar .resource-list {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+        
+        .resource-list li a {
+            display: block;
+            padding: 10px;
+            background-color: var(--primary-color-light);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .resource-list li a:hover {
+            background-color: #d4e3ee;
+        }
+        
+        .resource-list li a i {
+            margin-right: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-compass"></i>
+            <span>CareerNavigator</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            </li>
+            <li class="nav-item active">
+                <a href="mindmap.html"><i class="fa-solid fa-map-signs"></i><span>Strategy Map</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="job-search.html"><i class="fa-solid fa-briefcase"></i><span>Job Search</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tracker.html"><i class="fa-solid fa-tasks"></i><span>Application Tracker</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="document-studio.html"><i class="fa-solid fa-file-alt"></i><span>Document Studio</span></a>
+            </li>
+        </ul>
+        <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User Avatar">
+        </div>
+    </nav>
+    
+    <main class="main-content" id="mainContent">
+        <header class="header">
+            <h1>Your Dynamic Job Search Strategy</h1>
+            <p style="color: var(--text-light-color);">
+                Generated for your "Computer Science" major and "International Student" status. Click nodes for details and resources.
+            </p>
+        </header>
+        
+        <div class="mindmap-wrapper">
+            <div class="mindmap">
+                <ul class="central-topic">
+                    <li>
+                        <div class="node central">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            Job Search Strategy
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node" data-node="explore">
+                                    <i class="fa-solid fa-search"></i>
+                                    Self-Exploration
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node" data-node="prepare">
+                                    <i class="fa-solid fa-file-signature"></i>
+                                    Document Preparation
+                                </div>
+                                <ul>
+                                    <li>
+                                        <div class="node" data-node="cv">
+                                            Technical Resume (CV)
+                                        </div>
+                                    </li>
+                                     <li>
+                                        <div class="node" data-node="coverletter">
+                                            Cover Letter
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <div class="node" data-node="apply">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    Application & Interview
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node" data-node="visa">
+                                    <i class="fa-solid fa-passport"></i>
+                                    Visa Strategy (International)
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    
+    <aside class="details-sidebar" id="detailsSidebar">
+        <i class="fa-solid fa-times close-btn" id="closeBtn"></i>
+        <div id="sidebarContent">
+            </div>
+    </aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nodes = document.querySelectorAll('.node');
+        const sidebar = document.getElementById('detailsSidebar');
+        const sidebarContent = document.getElementById('sidebarContent');
+        const closeBtn = document.getElementById('closeBtn');
+        const mainContent = document.getElementById('mainContent');
+
+        // Node data in English
+        const nodeData = {
+            explore: {
+                title: 'Self-Exploration',
+                description: 'Clarify your career interests, strengths, and job search goals. This is the first step to a successful job search.',
+                resources: []
+            },
+            prepare: {
+                title: 'Document Preparation',
+                description: 'A perfect resume and cover letter are key to getting interviews. Make sure all documents are tailored to your target job.',
+                resources: []
+            },
+            cv: {
+                title: 'Technical Resume (CV)',
+                description: 'As a computer science student, your resume should highlight project experience, tech stack, and quantifiable achievements. Use the STAR method to describe your experience.',
+                resources: [
+                    { name: 'Go to AI Document Studio to optimize your resume', link: 'document-studio.html', icon: 'fa-file-alt' },
+                    { name: 'View Resume Templates', link: '#', icon: 'fa-book-open' }
+                ]
+            },
+            coverletter: {
+                title: 'Cover Letter',
+                description: 'The cover letter is your chance to show personality and motivation. Explain why you want to join the company and why you are the best fit.',
+                resources: [
+                    { name: 'Go to AI Document Studio to write a cover letter', link: 'document-studio.html', icon: 'fa-file-alt' }
+                ]
+            },
+            apply: {
+                title: 'Application & Interview',
+                description: 'Start applying and seeking referrals, and prepare for technical and behavioral interviews. Track every application status.',
+                resources: [
+                    { name: 'Go to Job Search', link: 'job-search.html', icon: 'fa-briefcase' },
+                    { name: 'Go to Application Tracker', link: 'tracker.html', icon: 'fa-tasks' }
+                ]
+            },
+            visa: {
+                title: 'Visa Strategy (International Students)',
+                description: 'Understanding work visa policies (e.g., UK Skilled Worker visa) is crucial. Prioritize companies with sponsorship history.',
+                resources: [
+                    { name: 'Search for visa-sponsored jobs', link: 'job-search.html', icon: 'fa-passport' },
+                    { name: 'Learn about the latest visa policies', link: '#', icon: 'fa-info-circle' }
+                ]
+            }
+        };
+
+        nodes.forEach(node => {
+            node.addEventListener('click', function() {
+                // Remove selected class from all other nodes
+                nodes.forEach(n => n.classList.remove('selected'));
+                // Add selected class to the clicked node
+                this.classList.add('selected');
+
+                const nodeId = this.getAttribute('data-node');
+                if (nodeId && nodeData[nodeId]) {
+                    const data = nodeData[nodeId];
+                    let resourcesHTML = '';
+                    if (data.resources.length > 0) {
+                        resourcesHTML = '<ul class="resource-list">';
+                        data.resources.forEach(res => {
+                            resourcesHTML += `<li><a href="${res.link}"><i class="fa-solid ${res.icon}"></i> ${res.name}</a></li>`;
+                        });
+                        resourcesHTML += '</ul>';
+                    }
+                    
+                    sidebarContent.innerHTML = `
+                        <h3>${data.title}</h3>
+                        <p>${data.description}</p>
+                        ${resourcesHTML}
+                    `;
+                    sidebar.classList.add('open');
+                    mainContent.classList.add('sidebar-open');
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            mainContent.classList.remove('sidebar-open');
+            nodes.forEach(n => n.classList.remove('selected'));
+        });
+    });
+</script>
+
+</body>
+</html>

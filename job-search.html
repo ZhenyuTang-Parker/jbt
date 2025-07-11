@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNavigator AI - Job Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #005A9C;
+            --primary-color-light: #E6F0F6;
+            --secondary-color: #F8B400;
+            --bg-color: #F4F7FC;
+            --text-color: #333;
+            --text-light-color: #777;
+            --border-color: #E0E0E0;
+            --card-bg-color: #FFFFFF;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+        }
+
+        /* --- 左侧导航栏 (Links updated) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .sidebar .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style-type: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-light-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a i {
+            width: 30px;
+            font-size: 1.2em;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .sidebar .profile-card {
+            padding: 20px;
+            margin: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .profile-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* --- 主内容区 --- */
+        .main-content-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+        }
+
+        /* --- 筛选器侧边栏 --- */
+        .filters-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+        
+        .filter-card {
+            background-color: var(--card-bg-color);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .filter-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .filter-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        /* 自定义Toggle开关 */
+        .visa-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        
+        .filter-actions {
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .btn-secondary {
+            background: none;
+            color: var(--text-light-color);
+            border: 1px solid var(--border-color);
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* --- 职位列表 --- */
+        .job-listings {
+            flex-grow: 1;
+        }
+        
+        .results-header {
+            margin-bottom: 20px;
+        }
+        
+        .results-header h2 {
+            font-size: 1.8em;
+        }
+        
+        .results-header p {
+            color: var(--text-light-color);
+        }
+        
+        .job-card {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color-light);
+        }
+        
+        .job-card .company-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: #eee;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            font-size: 1.5em;
+            color: var(--text-light-color);
+        }
+        
+        .job-details {
+            flex-grow: 1;
+        }
+        
+        .job-details h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .job-details .company-info {
+            color: var(--text-light-color);
+            margin-bottom: 15px;
+        }
+        .job-details .company-info span {
+            margin-right: 15px;
+        }
+        
+        .job-tags .tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-right: 8px;
+            background-color: #eee;
+        }
+        
+        .job-tags .tag.visa {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+        }
+        
+        .job-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .job-actions .btn-action {
+            padding: 8px 15px;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .job-actions .btn-action.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-compass"></i>
+            <span>CareerNavigator</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="mindmap.html"><i class="fa-solid fa-map-signs"></i><span>Strategy Map</span></a>
+            </li>
+            <li class="nav-item active">
+                <a href="job-search.html"><i class="fa-solid fa-briefcase"></i><span>Job Search</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tracker.html"><i class="fa-solid fa-tasks"></i><span>Application Tracker</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="document-studio.html"><i class="fa-solid fa-file-alt"></i><span>Document Studio</span></a>
+            </li>
+        </ul>
+        <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User Avatar">
+        </div>
+    </nav>
+
+    <div class="main-content-wrapper">
+        <aside class="filters-sidebar">
+            <div class="filter-card">
+                <h3><i class="fa-solid fa-filter"></i> Filter Jobs</h3>
+                <div class="filter-group">
+                    <label for="keywords">Keywords</label>
+                    <input type="text" id="keywords" placeholder="Job, Company, Skill">
+                </div>
+                <div class="filter-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="City, Country">
+                </div>
+                <div class="filter-group visa-filter">
+                    <label for="visa-toggle">Show only jobs with visa sponsorship</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="visa-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary">Apply Filters</button>
+                    <button class="btn btn-secondary">Clear All</button>
+                </div>
+            </div>
+             <div class="filter-card">
+                <h3>Advanced Filters</h3>
+                 <div class="filter-group">
+                    <label for="exclude-keywords">Exclude Company/Keyword</label>
+                    <input type="text" id="exclude-keywords" placeholder="e.g. Amazon">
+                </div>
+            </div>
+        </aside>
+
+        <section class="job-listings">
+            <div class="results-header">
+                <h2>Search Results</h2>
+                <p>128 jobs found for you</p>
+            </div>
+
+            <div class="job-card" data-visa="true">
+                <div class="company-logo"><i class="fab fa-google"></i></div>
+                <div class="job-details">
+                    <h3>Software Engineer (L4)</h3>
+                    <div class="company-info">
+                        <span>Google</span> &middot; <span>London, UK</span>
+                    </div>
+                    <div class="job-tags">
+                        <span class="tag visa">Visa Sponsored</span>
+                        <span class="tag">Full-time</span>
+                        <span class="tag">Alumni</span>
+                    </div>
+                </div>
+                <div class="job-actions">
+                    <button class="btn-action primary">Track Application</button>
+                    <button class="btn-action">Save</button>
+                </div>
+            </div>
+
+            <div class="job-card" data-visa="false">
+                <div class="company-logo"><i class="fa-solid fa-building"></i></div>
+                <div class="job-details">
+                    <h3>Frontend Intern</h3>
+                    <div class="company-info">
+                        <span>Local Web Solutions</span> &middot; <span>Southampton, UK</span>
+                    </div>
+                    <div class="job-tags">
+                        <span class="tag">Internship</span>
+                    </div>
+                </div>
+                <div class="job-actions">
+                    <button class="btn-action primary">Track Application</button>
+                    <button class="btn-action">Save</button>
+                </div>
+            </div>
+            
+            <div class="job-card" data-visa="true">
+                <div class="company-logo"><i class="fab fa-microsoft"></i></div>
+                <div class="job-details">
+                    <h3>Cloud Solutions Architect</h3>
+                    <div class="company-info">
+                        <span>Microsoft</span> &middot; <span>Remote</span>
+                    </div>
+                    <div class="job-tags">
+                        <span class="tag visa">Visa Sponsored</span>
+                        <span class="tag">Full-time</span>
+                        <span class="tag">Remote</span>
+                    </div>
+                </div>
+                 <div class="job-actions">
+                    <button class="btn-action primary">Track Application</button>
+                    <button class="btn-action">Save</button>
+                </div>
+            </div>
+
+            <div class="job-card" data-visa="false">
+                <div class="company-logo"><i class="fa-solid fa-university"></i></div>
+                <div class="job-details">
+                    <h3>Research Assistant</h3>
+                    <div class="company-info">
+                        <span>University of Southampton</span> &middot; <span>Southampton, UK</span>
+                    </div>
+                    <div class="job-tags">
+                        <span class="tag">Contract</span>
+                    </div>
+                </div>
+                 <div class="job-actions">
+                    <button class="btn-action primary">Track Application</button>
+                    <button class="btn-action">Save</button>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+<script>
+    // Simple UI demo, not real filtering
+    document.getElementById('visa-toggle').addEventListener('change', function() {
+        const isChecked = this.checked;
+        const jobCards = document.querySelectorAll('.job-card');
+        
+        jobCards.forEach(card => {
+            // If toggle is checked, hide all cards not data-visa="true"
+            if (isChecked) {
+                if (card.getAttribute('data-visa') !== 'true') {
+                    card.style.display = 'none';
+                } else {
+                    card.style.display = 'flex';
+                }
+            } else {
+                // If toggle is not checked, show all cards
+                card.style.display = 'flex';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

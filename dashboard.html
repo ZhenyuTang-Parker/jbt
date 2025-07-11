@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNavigator AI - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #005A9C; /* 大学品牌主色调 (例如: 牛津蓝) */
+            --primary-color-light: #E6F0F6;
+            --secondary-color: #F8B400; /* 亮色，用于强调 */
+            --bg-color: #F4F7FC;
+            --text-color: #333;
+            --text-light-color: #777;
+            --border-color: #E0E0E0;
+            --card-bg-color: #FFFFFF;
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+        }
+
+        /* --- 左侧导航栏 --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--card-bg-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .sidebar .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            list-style-type: none;
+            flex-grow: 1;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--text-light-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a i {
+            width: 30px;
+            font-size: 1.2em;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .sidebar .profile-card {
+            padding: 20px;
+            margin: 15px;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .profile-card img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .profile-card h4 {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .profile-card p {
+            font-size: 0.9em;
+            color: var(--text-light-color);
+        }
+
+
+        /* --- 主内容区 --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- 顶部 Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-actions .notification-bell {
+            font-size: 1.5em;
+            color: var(--text-light-color);
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            margin-left: 15px;
+        }
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+        .btn i {
+            margin-right: 8px;
+        }
+
+        /* --- 仪表盘网格布局 --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-header .icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            color: var(--primary-color);
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            background-color: var(--primary-color-light);
+            border-radius: 10px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* --- 卡片具体内容样式 --- */
+        /* 下一步卡片 */
+        .task-list {
+            list-style-type: none;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+        }
+        .task-item label {
+            flex-grow: 1;
+        }
+        
+        /* 申请概览卡片 */
+        .funnel {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .funnel-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .funnel-item .count {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .funnel-item .label {
+            color: var(--text-light-color);
+            font-size: 0.9em;
+        }
+        .funnel-arrow {
+            font-size: 1.5em;
+            color: var(--border-color);
+            align-self: center;
+        }
+        
+        /* 推荐职位卡片 */
+        .job-list {
+            list-style-type: none;
+        }
+        .job-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .job-item:last-child {
+            border-bottom: none;
+        }
+        .job-info h4 {
+            font-weight: 500;
+        }
+        .job-info p {
+            font-size: 0.9em;
+            color: var(--text-light-color);
+        }
+        .job-tag {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        /* AI 助手 */
+        .ai-assistant-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 90, 156, 0.4);
+            transition: transform 0.3s ease;
+        }
+        .ai-assistant-fab:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-actions {
+                margin-top: 15px;
+            }
+            /* Add a hamburger menu button to toggle sidebar on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-compass"></i>
+            <span>CareerNavigator</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active">
+                <a href="dashboard.html"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="mindmap.html"><i class="fa-solid fa-map-signs"></i><span>Strategy Map</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="job-search.html"><i class="fa-solid fa-briefcase"></i><span>Job Search</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="tracker.html"><i class="fa-solid fa-tasks"></i><span>Application Tracker</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="document-studio.html"><i class="fa-solid fa-file-alt"></i><span>Document Studio</span></a>
+            </li>
+        </ul>
+        <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User Avatar">
+            <h4>Zhang Wei</h4>
+            <p>Computer Science</p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1>Good afternoon, Zhang Wei!</h1>
+                <p style="color: var(--text-light-color);">Welcome back to your career navigation center.</p>
+            </div>
+            <div class="header-actions">
+                <i class="fa-regular fa-bell notification-bell"></i>
+                <a href="mindmap.html" class="btn btn-primary"><i class="fa-solid fa-map-signs"></i> Generate My Strategy Map</a>
+                <a href="job-search.html" class="btn btn-secondary"><i class="fa-solid fa-search"></i> Search Jobs</a>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <div class="icon"><i class="fa-solid fa-list-check"></i></div>
+                    <h3>Your Next Steps</h3>
+                </div>
+                <ul class="task-list">
+                    <li class="task-item">
+                        <input type="checkbox" id="task1" checked>
+                        <label for="task1">Complete your profile to unlock personalized recommendations</label>
+                    </li>
+                    <li class="task-item">
+                        <input type="checkbox" id="task2">
+                        <label for="task2">Upload your base resume to the Document Studio</label>
+                    </li>
+                    <li class="task-item">
+                        <input type="checkbox" id="task3">
+                        <label for="task3">Book a 15-minute quick consultation with a career advisor</label>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon"><i class="fa-solid fa-filter"></i></div>
+                    <h3>Application Overview</h3>
+                </div>
+                <div class="funnel">
+                    <div class="funnel-item">
+                        <div class="count">25</div>
+                        <div class="label">Saved</div>
+                    </div>
+                    <div class="funnel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="funnel-item">
+                        <div class="count">8</div>
+                        <div class="label">Applied</div>
+                    </div>
+                    <div class="funnel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="funnel-item">
+                        <div class="count">2</div>
+                        <div class="label">Interviewing</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon"><i class="fa-solid fa-star"></i></div>
+                    <h3>Recommended Jobs</h3>
+                </div>
+                <ul class="job-list">
+                    <li class="job-item">
+                        <div class="job-info">
+                            <h4>Software Engineer</h4>
+                            <p>Google - London, UK</p>
+                        </div>
+                        <span class="job-tag">Visa Sponsored</span>
+                    </li>
+                    <li class="job-item">
+                        <div class="job-info">
+                            <h4>Data Analyst Intern</h4>
+                            <p>Tencent - Remote</p>
+                        </div>
+                        <span class="job-tag">Alumni</span>
+                    </li>
+                    <li class="job-item">
+                        <div class="job-info">
+                            <h4>Product Manager</h4>
+                            <p>Microsoft - Southampton, UK</p>
+                        </div>
+                         <span class="job-tag">Visa Sponsored</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    
+    <div class="ai-assistant-fab">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+</body>
+</html>
